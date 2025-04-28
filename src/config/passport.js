@@ -79,7 +79,7 @@ module.exports = function(app) {
     clientID: process.env.LINKEDIN_CLIENT_ID,
     clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
     callbackURL: '/api/auth/linkedin/callback',
-    //scope: ['r_emailaddress', 'r_liteprofile'],
+    scope: ['openid', 'profile', 'email'],
     passReqToCallback: true,
   }, async (req, accessToken, refreshToken, profile, done) => {
     try {
@@ -93,9 +93,15 @@ module.exports = function(app) {
       
       // If user doesn't exist, check if email already exists
       if (!user) {
+        // Get email from profile - handle different profile structures
+        const email = profile.email || 
+                     (profile.emails && profile.emails[0] && profile.emails[0].value) || 
+                     (profile._json && profile._json.email) ||
+                     `${profile.id}@linkedin.com`; // Fallback email if none provided
+        
         const userWithEmail = await User.findOne({ 
           where: { 
-            email: profile.emails[0].value 
+            email: email 
           } 
         });
         
@@ -114,9 +120,13 @@ module.exports = function(app) {
         
         // Create new user
         user = await User.create({
-          email: profile.emails[0].value,
-          first_name: profile.name.givenName || profile.displayName.split(' ')[0],
-          last_name: profile.name.familyName || profile.displayName.split(' ').slice(1).join(' '),
+          email: email,
+          first_name: (profile.name && profile.name.givenName) || 
+                     (profile.displayName && profile.displayName.split(' ')[0]) || 
+                     'LinkedIn',
+          last_name: (profile.name && profile.name.familyName) || 
+                    (profile.displayName && profile.displayName.split(' ').slice(1).join(' ')) || 
+                    'User',
           provider: 'linkedin',
           provider_id: profile.id,
           role: 'student', // Default role for new users
