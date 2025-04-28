@@ -33,7 +33,7 @@ router.get('/linkedin/callback',
     const { user, token } = req.user;
     
     // Create redirect URL with token and user info
-    const redirectUrl = `${process.env.FRONTEND_URL || 'http://localhost:5000/api/auth/linkedin/callback'}?` +
+    const redirectUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?` +
       `token=${token}` + 
       `&id=${user.id}` +
       `&email=${encodeURIComponent(user.email)}` +
