@@ -32,6 +32,8 @@ module.exports = function(app) {
         } 
       });
       
+      const currentTime = new Date();
+      
       // If user doesn't exist, check if email already exists
       if (!user) {
         const userWithEmail = await User.findOne({ 
@@ -45,6 +47,8 @@ module.exports = function(app) {
           userWithEmail.provider = 'google';
           userWithEmail.provider_id = profile.id;
           userWithEmail.is_active = true;
+          userWithEmail.last_login = currentTime;
+          userWithEmail.last_active = currentTime;
           await userWithEmail.save();
           
           return done(null, {
@@ -61,8 +65,15 @@ module.exports = function(app) {
           provider: 'google',
           provider_id: profile.id,
           role: 'student', // Default role
-          is_active: true
+          is_active: true,
+          last_login: currentTime,
+          last_active: currentTime
         });
+      } else {
+        // Update existing user's last login and active time
+        user.last_login = currentTime;
+        user.last_active = currentTime;
+        await user.save();
       }
       
       return done(null, {
@@ -91,6 +102,8 @@ module.exports = function(app) {
         } 
       });
       
+      const currentTime = new Date();
+      
       // If user doesn't exist, check if email already exists
       if (!user) {
         // Get email from profile - handle different profile structures
@@ -110,6 +123,8 @@ module.exports = function(app) {
           userWithEmail.provider = 'linkedin';
           userWithEmail.provider_id = profile.id;
           userWithEmail.is_active = true;
+          userWithEmail.last_login = currentTime;
+          userWithEmail.last_active = currentTime;
           await userWithEmail.save();
           
           return done(null, {
@@ -130,8 +145,15 @@ module.exports = function(app) {
           provider: 'linkedin',
           provider_id: profile.id,
           role: 'student', // Default role for new users
-          is_active: true
+          is_active: true,
+          last_login: currentTime,
+          last_active: currentTime
         });
+      } else {
+        // Update existing user's last login and active time
+        user.last_login = currentTime;
+        user.last_active = currentTime;
+        await user.save();
       }
       
       return done(null, {
