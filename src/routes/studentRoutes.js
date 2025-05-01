@@ -6,7 +6,6 @@ const { protect, checkRole, isActive } = require('../middleware/authMiddleware')
 
 // Public routes
 router.get('/', studentController.getAllStudents);
-router.get('/:id', studentController.getStudentById);
 
 // Private routes - Student only
 router.post('/profile', protect, checkRole(['student']), studentController.createUpdateStudentProfile);
@@ -34,5 +33,8 @@ router.delete('/project-experience/:id', protect, checkRole(['student']), studen
 router.post('/certification', protect, checkRole(['student']), studentController.addCertification);
 router.put('/certification/:id', protect, checkRole(['student']), studentController.updateCertification);
 router.delete('/certification/:id', protect, checkRole(['student']), studentController.deleteCertification);
+
+// Put the generic ID route LAST, after all specific routes
+router.get('/:id', studentController.getStudentById);
 
 module.exports = router; 

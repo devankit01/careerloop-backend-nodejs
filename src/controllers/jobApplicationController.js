@@ -101,7 +101,7 @@ exports.getStudentApplications = async (req, res) => {
                 {
                   model: User,
                   as: 'user',
-                  attributes: ['id', 'name']
+                  attributes: ['id', 'first_name', 'last_name']
                 }
               ]
             }
@@ -165,7 +165,7 @@ exports.getJobApplications = async (req, res) => {
             {
               model: User,
               as: 'user',
-              attributes: ['id', 'name', 'email']
+              attributes: ['id', 'first_name', 'last_name', 'email']
             }
           ]
         }

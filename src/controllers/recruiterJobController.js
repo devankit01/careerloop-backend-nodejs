@@ -98,7 +98,7 @@ exports.getJobById = async (req, res) => {
             {
               model: User,
               as: 'user',
-              attributes: ['id', 'name', 'email']
+              attributes: ['id', 'first_name', 'last_name', 'email']
             }
           ]
         }
@@ -112,24 +112,35 @@ exports.getJobById = async (req, res) => {
       });
     }
 
-    // If user is not recruiter, job must be posted (not draft or archived)
-    if (req.user.role !== 'recruiter' && job.status !== 'Posted') {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied'
-      });
-    }
+    // Public route check
+    if (!req.user) {
+      // For public access, job must be posted
+      if (job.status !== 'Posted') {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied'
+        });
+      }
+    } else {
+      // If authenticated user is not recruiter, job must be posted
+      if (req.user.role !== 'recruiter' && job.status !== 'Posted') {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied'
+        });
+      }
 
-    // If user is recruiter but not the job owner, job must be posted
-    if (
-      req.user.role === 'recruiter' && 
-      job.recruiter.user_id !== req.user.id && 
-      job.status !== 'Posted'
-    ) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied'
-      });
+      // If user is recruiter but not the job owner, job must be posted
+      if (
+        req.user.role === 'recruiter' && 
+        job.recruiter.user_id !== req.user.id && 
+        job.status !== 'Posted'
+      ) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied'
+        });
+      }
     }
 
     res.json({
@@ -279,7 +290,7 @@ exports.getAllPublishedJobs = async (req, res) => {
             {
               model: User,
               as: 'user',
-              attributes: ['id', 'name']
+              attributes: ['id', 'first_name', 'last_name']
             }
           ]
         }

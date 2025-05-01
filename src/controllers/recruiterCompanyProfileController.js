@@ -117,7 +117,7 @@ exports.getCompanyProfileById = async (req, res) => {
             {
               model: User,
               as: 'user',
-              attributes: ['id', 'name']
+              attributes: ['id', 'first_name', 'last_name']
             }
           ]
         }
