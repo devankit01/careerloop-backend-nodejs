@@ -31,7 +31,10 @@ const app = express();
 
 // Middleware
 app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS
+app.use(cors({
+  origin: ['https://careerflow-frontend.vercel.app'],
+  credentials: true
+})); // Enable CORS with specific origin and credentials
 app.use(express.json()); // Parse JSON request body
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
