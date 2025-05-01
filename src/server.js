@@ -24,6 +24,7 @@ const studentRoutes = require('./routes/studentRoutes');
 const recruiterRoutes = require('./routes/recruiterRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const authRoutes = require('./routes/authRoutes');
+const collegeRoutes = require('./routes/collegeRoutes');
 
 // Initialize express app
 const app = express();
@@ -54,6 +55,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/recruiters', recruiterRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/colleges', collegeRoutes);
 
 // Default route
 app.get('/', (req, res) => {

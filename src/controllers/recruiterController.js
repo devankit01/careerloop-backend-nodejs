@@ -15,7 +15,7 @@ exports.getRecruiterProfile = async (req, res) => {
         {
           model: User,
           as: 'user',
-          attributes: ['id', 'name', 'email', 'role']
+          attributes: ['id', 'first_name', 'last_name', 'email', 'role']
         }
       ]
     });
