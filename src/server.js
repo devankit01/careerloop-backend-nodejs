@@ -33,7 +33,8 @@ const app = express();
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors({
-  origin: ['http://localhost:5173'],
+  origin: ['https://careerflow-frontend.vercel.app'],
+  // origin: ['http://localhost:5173'],
   credentials: true
 })); // Enable CORS with specific origin and credentials
 app.use(express.json()); // Parse JSON request body
