@@ -11,6 +11,19 @@ const generateToken = (id) => {
   });
 };
 
+// Function to extract role from state parameter
+const getRoleFromState = (req) => {
+  try {
+    if (req.query.state) {
+      const stateObj = JSON.parse(Buffer.from(req.query.state, 'base64').toString());
+      return stateObj.role || 'student';
+    }
+  } catch (error) {
+    console.error('Error parsing state:', error);
+  }
+  return 'student'; // Default fallback
+};
+
 module.exports = function(app) {
   // Initialize passport
   app.use(passport.initialize());
@@ -24,6 +37,9 @@ module.exports = function(app) {
     scope: ['profile', 'email']
   }, async (req, accessToken, refreshToken, profile, done) => {
     try {
+      // Get role from state parameter
+      const role = getRoleFromState(req);
+
       // Check if user exists
       let user = await User.findOne({ 
         where: { 
@@ -57,14 +73,14 @@ module.exports = function(app) {
           });
         }
         
-        // Create new user
+        // Create new user with selected role
         user = await User.create({
           email: profile.emails[0].value,
           first_name: profile.name.givenName || profile.displayName.split(' ')[0],
           last_name: profile.name.familyName || profile.displayName.split(' ').slice(1).join(' '),
           provider: 'google',
           provider_id: profile.id,
-          role: 'student', // Default role
+          role: role, // Use the role from state
           is_active: true,
           last_login: currentTime,
           last_active: currentTime
@@ -94,6 +110,9 @@ module.exports = function(app) {
     passReqToCallback: true,
   }, async (req, accessToken, refreshToken, profile, done) => {
     try {
+      // Get role from state parameter
+      const role = getRoleFromState(req);
+
       // Check if user exists
       let user = await User.findOne({ 
         where: { 
@@ -133,7 +152,7 @@ module.exports = function(app) {
           });
         }
         
-        // Create new user
+        // Create new user with selected role
         user = await User.create({
           email: email,
           first_name: (profile.name && profile.name.givenName) || 
@@ -144,7 +163,7 @@ module.exports = function(app) {
                     'User',
           provider: 'linkedin',
           provider_id: profile.id,
-          role: 'student', // Default role for new users
+          role: role, // Use the role from state
           is_active: true,
           last_login: currentTime,
           last_active: currentTime

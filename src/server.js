@@ -25,6 +25,7 @@ const recruiterRoutes = require('./routes/recruiterRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const authRoutes = require('./routes/authRoutes');
 const collegeRoutes = require('./routes/collegeRoutes');
+const resumeCollectionRoutes = require('./routes/resumeCollectionRoutes');
 
 // Initialize express app
 const app = express();
@@ -33,6 +34,7 @@ const app = express();
 app.use(helmet()); // Security headers
 app.use(cors({
   origin: ['https://careerflow-frontend.vercel.app'],
+  // origin: ['http://localhost:5173'],
   credentials: true
 })); // Enable CORS with specific origin and credentials
 app.use(express.json()); // Parse JSON request body
@@ -59,6 +61,7 @@ app.use('/api/recruiters', recruiterRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/colleges', collegeRoutes);
+app.use('/api/resume-collections', resumeCollectionRoutes);
 
 // Default route
 app.get('/', (req, res) => {
