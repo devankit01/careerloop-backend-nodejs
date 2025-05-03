@@ -33,9 +33,19 @@ const app = express();
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors({
-  origin: ['https://careerflow-frontend.vercel.app'],
-  credentials: true
-})); // Enable CORS with specific origin and credentials
+  origin: [
+    'https://careerflow-frontend.vercel.app',
+    'https://dev-apis-node.careerloop.in',
+    'https://careerloop.in',
+    'https://www.careerloop.in',
+    'https://dev.careerloop.in',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+})); // Enable CORS with specific origins and credentials
 app.use(express.json()); // Parse JSON request body
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
