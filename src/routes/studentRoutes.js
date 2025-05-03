@@ -34,6 +34,11 @@ router.post('/certification', protect, checkRole(['student']), studentController
 router.put('/certification/:id', protect, checkRole(['student']), studentController.updateCertification);
 router.delete('/certification/:id', protect, checkRole(['student']), studentController.deleteCertification);
 
+// Award/Achievement routes
+router.post('/award-achievement', protect, checkRole(['student']), studentController.addAwardAchievement);
+router.put('/award-achievement/:id', protect, checkRole(['student']), studentController.updateAwardAchievement);
+router.delete('/award-achievement/:id', protect, checkRole(['student']), studentController.deleteAwardAchievement);
+
 // Put the generic ID route LAST, after all specific routes
 router.get('/:id', studentController.getStudentById);
 

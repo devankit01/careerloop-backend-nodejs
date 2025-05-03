@@ -4,6 +4,7 @@ const Education = require('../models/Education');
 const WorkExperience = require('../models/WorkExperience');
 const ProjectExperience = require('../models/ProjectExperience');
 const Certification = require('../models/Certification');
+const AwardAchievement = require('../models/AwardAchievement');
 
 // @desc    Create or update student profile
 // @route   POST /api/students/profile
@@ -96,6 +97,10 @@ exports.getStudentProfile = async (req, res) => {
         {
           model: Certification,
           as: 'certifications'
+        },
+        {
+          model: AwardAchievement,
+          as: 'awardAchievements'
         }
       ]
     });
@@ -148,6 +153,10 @@ exports.getStudentById = async (req, res) => {
         {
           model: Certification,
           as: 'certifications'
+        },
+        {
+          model: AwardAchievement,
+          as: 'awardAchievements'
         }
       ]
     });
@@ -811,6 +820,162 @@ exports.deleteCertification = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to delete certification',
+      error: process.env.NODE_ENV === 'production' ? null : error.message
+    });
+  }
+};
+
+// @desc    Add award/achievement
+// @route   POST /api/students/award-achievement
+// @access  Private (Student only)
+exports.addAwardAchievement = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    // First get the student ID from the user ID
+    const student = await Student.findOne({ where: { user_id: userId } });
+    
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student profile not found'
+      });
+    }
+    
+    const { title, issuer, description, date } = req.body;
+    
+    if (!title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title is required'
+      });
+    }
+    
+    const awardAchievement = await AwardAchievement.create({
+      title,
+      issuer,
+      description,
+      date,
+      jobseeker_id: student.id
+    });
+    
+    res.status(201).json({
+      success: true,
+      data: awardAchievement
+    });
+  } catch (error) {
+    console.error('Add award/achievement error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to add award/achievement',
+      error: process.env.NODE_ENV === 'production' ? null : error.message
+    });
+  }
+};
+
+// @desc    Update award/achievement
+// @route   PUT /api/students/award-achievement/:id
+// @access  Private (Student only)
+exports.updateAwardAchievement = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const awardAchievementId = req.params.id;
+    
+    // First get the student ID from the user ID
+    const student = await Student.findOne({ where: { user_id: userId } });
+    
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student profile not found'
+      });
+    }
+    
+    // Check if the award/achievement exists and belongs to this student
+    let awardAchievement = await AwardAchievement.findOne({
+      where: { 
+        id: awardAchievementId,
+        jobseeker_id: student.id 
+      }
+    });
+    
+    if (!awardAchievement) {
+      return res.status(404).json({
+        success: false,
+        message: 'Award/achievement not found or you do not have permission to update it'
+      });
+    }
+    
+    const { title, issuer, description, date } = req.body;
+    
+    await awardAchievement.update({
+      title: title || awardAchievement.title,
+      issuer: issuer !== undefined ? issuer : awardAchievement.issuer,
+      description: description !== undefined ? description : awardAchievement.description,
+      date: date !== undefined ? date : awardAchievement.date
+    });
+    
+    // Refetch the updated award/achievement
+    awardAchievement = await AwardAchievement.findByPk(awardAchievementId);
+    
+    res.json({
+      success: true,
+      data: awardAchievement
+    });
+  } catch (error) {
+    console.error('Update award/achievement error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update award/achievement',
+      error: process.env.NODE_ENV === 'production' ? null : error.message
+    });
+  }
+};
+
+// @desc    Delete award/achievement
+// @route   DELETE /api/students/award-achievement/:id
+// @access  Private (Student only)
+exports.deleteAwardAchievement = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const awardAchievementId = req.params.id;
+    
+    // First get the student ID from the user ID
+    const student = await Student.findOne({ where: { user_id: userId } });
+    
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student profile not found'
+      });
+    }
+    
+    // Check if the award/achievement exists and belongs to this student
+    const awardAchievement = await AwardAchievement.findOne({
+      where: { 
+        id: awardAchievementId,
+        jobseeker_id: student.id 
+      }
+    });
+    
+    if (!awardAchievement) {
+      return res.status(404).json({
+        success: false,
+        message: 'Award/achievement not found or you do not have permission to delete it'
+      });
+    }
+    
+    await awardAchievement.destroy();
+    
+    res.json({
+      success: true,
+      message: 'Award/achievement deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete award/achievement error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete award/achievement',
       error: process.env.NODE_ENV === 'production' ? null : error.message
     });
   }

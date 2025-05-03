@@ -2,8 +2,16 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 
-// Google OAuth routes
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// Google OAuth routes - add role selection via state parameter
+router.get('/google', (req, res, next) => {
+  const role = req.query.role || 'student';
+  const state = Buffer.from(JSON.stringify({ role })).toString('base64');
+  
+  passport.authenticate('google', { 
+    scope: ['profile', 'email'],
+    state
+  })(req, res, next);
+});
 
 router.get('/google/callback', 
   passport.authenticate('google', { session: false, failureRedirect: '/login' }),
@@ -24,10 +32,16 @@ router.get('/google/callback',
   }
 );
 
-// LinkedIn OAuth routes
-router.get('/linkedin', passport.authenticate('linkedin', { 
-  scope: ['openid', 'profile', 'email'] 
-}));
+// LinkedIn OAuth routes - add role selection via state parameter
+router.get('/linkedin', (req, res, next) => {
+  const role = req.query.role || 'student';
+  const state = Buffer.from(JSON.stringify({ role })).toString('base64');
+  
+  passport.authenticate('linkedin', { 
+    scope: ['openid', 'profile', 'email'],
+    state
+  })(req, res, next);
+});
 
 router.get('/linkedin/callback',
   passport.authenticate('linkedin', { session: false, failureRedirect: '/login' }),
