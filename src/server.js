@@ -32,20 +32,31 @@ const app = express();
 
 // Middleware
 app.use(helmet()); // Security headers
+// Use a function for CORS origin to properly validate the origin
 app.use(cors({
-  origin: [
-    'https://careerflow-frontend.vercel.app',
-    'https://dev-apis-node.careerloop.in',
-    'https://careerloop.in',
-    'https://www.careerloop.in',
-    'https://dev.careerloop.in',
-    'http://localhost:3000',
-    'http://localhost:5173'
-  ],
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      'https://careerflow-frontend.vercel.app',
+      'https://dev-apis-node.careerloop.in',
+      'https://careerloop.in',
+      'https://www.careerloop.in',
+      'https://dev.careerloop.in',
+      'http://localhost:3000',
+      'http://localhost:5173'
+    ];
+    
+    // Allow requests with no origin (like mobile apps, curl, etc)
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, origin);
+    } else {
+      console.log('CORS blocked for origin:', origin);
+      callback(new Error('Not allowed by CORS'), false);
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-})); // Enable CORS with specific origins and credentials
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key']
+}));
 app.use(express.json()); // Parse JSON request body
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
