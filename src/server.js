@@ -58,26 +58,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key']
 }));
 
-// Add this debugging middleware right after your CORS middleware to see what's happening
-app.use((req, res, next) => {
-  // Add a hook to capture response headers before they're sent
-  const originalSend = res.send;
-  res.send = function() {
-    // Log CORS-related headers
-    console.log(`[CORS DEBUG] Request from origin: ${req.headers.origin}`);
-    console.log(`[CORS DEBUG] Method: ${req.method}, Path: ${req.path}`);
-    console.log(`[CORS DEBUG] Response headers:`, {
-      'Access-Control-Allow-Origin': res.get('Access-Control-Allow-Origin'),
-      'Access-Control-Allow-Credentials': res.get('Access-Control-Allow-Credentials'),
-      'Access-Control-Allow-Methods': res.get('Access-Control-Allow-Methods'),
-      'Access-Control-Allow-Headers': res.get('Access-Control-Allow-Headers')
-    });
-    
-    return originalSend.apply(this, arguments);
-  };
-  next();
-});
-
 app.use(express.json()); // Parse JSON request body
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
