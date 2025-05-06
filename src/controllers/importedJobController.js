@@ -6,7 +6,7 @@ const Contact = require('../models/Contact');
 const Document = require('../models/Document');
 
 // @desc    Add imported job
-// @route   POST /api/students/imported-jobs
+// @route   POST /api/imported-jobs
 // @access  Private (Student only)
 exports.addImportedJob = async (req, res) => {
   try {
@@ -52,7 +52,7 @@ exports.addImportedJob = async (req, res) => {
 };
 
 // @desc    Get all imported jobs for a student
-// @route   GET /api/students/imported-jobs
+// @route   GET /api/imported-jobs
 // @access  Private (Student only)
 exports.getImportedJobs = async (req, res) => {
   try {
@@ -89,7 +89,7 @@ exports.getImportedJobs = async (req, res) => {
 };
 
 // @desc    Get imported job by ID
-// @route   GET /api/students/imported-jobs/:id
+// @route   GET /api/imported-jobs/:id
 // @access  Private (Student only)
 exports.getImportedJobById = async (req, res) => {
   try {
@@ -154,7 +154,7 @@ exports.getImportedJobById = async (req, res) => {
 };
 
 // @desc    Update imported job
-// @route   PUT /api/students/imported-jobs/:id
+// @route   PUT /api/imported-jobs/:id
 // @access  Private (Student only)
 exports.updateImportedJob = async (req, res) => {
   try {
@@ -215,7 +215,7 @@ exports.updateImportedJob = async (req, res) => {
 };
 
 // @desc    Delete imported job
-// @route   DELETE /api/students/imported-jobs/:id
+// @route   DELETE /api/imported-jobs/:id
 // @access  Private (Student only)
 exports.deleteImportedJob = async (req, res) => {
   try {

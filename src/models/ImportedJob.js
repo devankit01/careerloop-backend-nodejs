@@ -44,8 +44,9 @@ const ImportedJob = sequelize.define('ImportedJob', {
     allowNull: true
   },
   imported_job_status: {
-    type: DataTypes.STRING(50),
-    allowNull: true
+    type: DataTypes.ENUM('Saved', 'Applied', 'Interviewing', 'Offer', 'Rejected'),
+    allowNull: true,
+    defaultValue: 'Saved'
   },
   jobseeker_id: {
     type: DataTypes.INTEGER,
