@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const studentController = require('../controllers/studentController');
 const jobApplicationController = require('../controllers/jobApplicationController');
+const contactController = require('../controllers/contactController');
 const { protect, checkRole, isActive } = require('../middleware/authMiddleware');
 
 // Public routes
@@ -38,6 +39,13 @@ router.delete('/certification/:id', protect, checkRole(['student']), studentCont
 router.post('/award-achievement', protect, checkRole(['student']), studentController.addAwardAchievement);
 router.put('/award-achievement/:id', protect, checkRole(['student']), studentController.updateAwardAchievement);
 router.delete('/award-achievement/:id', protect, checkRole(['student']), studentController.deleteAwardAchievement);
+
+// Contact routes
+router.get('/contacts', protect, checkRole(['student']), contactController.getContacts);
+router.get('/contacts/:id', protect, checkRole(['student']), contactController.getContactById);
+router.post('/contacts', protect, checkRole(['student']), contactController.addContact);
+router.put('/contacts/:id', protect, checkRole(['student']), contactController.updateContact);
+router.delete('/contacts/:id', protect, checkRole(['student']), contactController.deleteContact);
 
 // Put the generic ID route LAST, after all specific routes
 router.get('/:id', studentController.getStudentById);
