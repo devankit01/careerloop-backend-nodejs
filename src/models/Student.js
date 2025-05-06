@@ -20,7 +20,6 @@ const Student = sequelize.define('Student', {
   phone: {
     type: DataTypes.STRING(255),
     allowNull: true,
-    unique: true
   },
   gender: {
     type: DataTypes.STRING(255),
