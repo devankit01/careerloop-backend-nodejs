@@ -4,6 +4,7 @@ const importedJobController = require('../controllers/importedJobController');
 const { protect, checkRole } = require('../middleware/authMiddleware');
 
 // All routes are protected for students only
+router.get('/statuses', protect, checkRole(['student']), importedJobController.getJobStatuses);
 router.post('/', protect, checkRole(['student']), importedJobController.addImportedJob);
 router.get('/', protect, checkRole(['student']), importedJobController.getImportedJobs);
 router.get('/:id', protect, checkRole(['student']), importedJobController.getImportedJobById);
