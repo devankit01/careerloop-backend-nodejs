@@ -9,7 +9,7 @@ const Document = sequelize.define('Document', {
   },
   file_url: {
     type: DataTypes.STRING(255),
-    allowNull: false
+    allowNull: true
   },
   document_category: {
     type: DataTypes.STRING(255),

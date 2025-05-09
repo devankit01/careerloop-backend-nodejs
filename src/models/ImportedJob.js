@@ -1,6 +1,9 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/dbConfig');
 
+// Default statuses that will always be available
+const DEFAULT_STATUSES = ['Saved', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
+
 const ImportedJob = sequelize.define('ImportedJob', {
   id: {
     type: DataTypes.INTEGER,
@@ -44,9 +47,19 @@ const ImportedJob = sequelize.define('ImportedJob', {
     allowNull: true
   },
   imported_job_status: {
-    type: DataTypes.ENUM('Saved', 'Applied', 'Interviewing', 'Offer', 'Rejected'),
+    type: DataTypes.STRING(50),
     allowNull: true,
-    defaultValue: 'Saved'
+    defaultValue: 'Saved',
+    validate: {
+      isValidStatus(value) {
+        if (value && !DEFAULT_STATUSES.includes(value)) {
+          // Allow custom statuses but ensure they're not empty and are strings
+          if (typeof value !== 'string' || value.trim().length === 0) {
+            throw new Error('Invalid job status');
+          }
+        }
+      }
+    }
   },
   jobseeker_id: {
     type: DataTypes.INTEGER,
@@ -70,6 +83,11 @@ const ImportedJob = sequelize.define('ImportedJob', {
   createdAt: 'created_at',
   updatedAt: 'updated_at'
 });
+
+// Add a static method to get all available statuses
+ImportedJob.getAvailableStatuses = function() {
+  return [...DEFAULT_STATUSES];
+};
 
 // Note: Associations are defined in src/config/dbInit.js
 

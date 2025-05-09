@@ -5,6 +5,26 @@ const Note = require('../models/Note');
 const Contact = require('../models/Contact');
 const Document = require('../models/Document');
 
+// @desc    Get all available job statuses
+// @route   GET /api/imported-jobs/statuses
+// @access  Private (Student only)
+exports.getJobStatuses = async (req, res) => {
+  try {
+    const statuses = ImportedJob.getAvailableStatuses();
+    res.json({
+      success: true,
+      data: statuses
+    });
+  } catch (error) {
+    console.error('Get job statuses error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get job statuses',
+      error: process.env.NODE_ENV === 'production' ? null : error.message
+    });
+  }
+};
+
 // @desc    Add imported job
 // @route   POST /api/imported-jobs
 // @access  Private (Student only)
@@ -34,7 +54,7 @@ exports.addImportedJob = async (req, res) => {
       description: req.body.description,
       skills: req.body.skills,
       perks: req.body.perks,
-      imported_job_status: req.body.imported_job_status || 'New'
+      imported_job_status: req.body.imported_job_status || 'Saved'
     });
     
     res.status(201).json({
@@ -45,7 +65,7 @@ exports.addImportedJob = async (req, res) => {
     console.error('Add imported job error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to add imported job',
+      message: error.message === 'Invalid job status' ? 'Invalid job status provided' : 'Failed to add imported job',
       error: process.env.NODE_ENV === 'production' ? null : error.message
     });
   }
