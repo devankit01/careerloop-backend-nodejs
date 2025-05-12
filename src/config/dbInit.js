@@ -16,6 +16,10 @@ const Recruiter = require('../models/Recruiter');
 const RecruiterJob = require('../models/RecruiterJob');
 const RecruiterJobApplication = require('../models/RecruiterJobApplication');
 const RecruiterCompanyProfile = require('../models/RecruiterCompanyProfile');
+const Preference = require('../models/Preference');
+const Location = require('../models/Location');
+const JobProfile = require('../models/JobProfile');
+const JobData = require('../models/JobData');
 
 // Define associations
 Student.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
@@ -88,6 +92,10 @@ Student.hasMany(AwardAchievement, { foreignKey: 'jobseeker_id', as: 'awardAchiev
 ResumeCollection.belongsTo(Student, { foreignKey: 'jobseeker_id', as: 'student' });
 Student.hasMany(ResumeCollection, { foreignKey: 'jobseeker_id', as: 'resumeCollections' });
 
+// New associations for Preference
+Preference.belongsTo(Student, { foreignKey: 'student_id', as: 'student' });
+Student.hasMany(Preference, { foreignKey: 'student_id', as: 'preferences' });
+
 // Initialize database and create tables in the proper order
 const initDatabase = async () => {
   try {
@@ -159,7 +167,19 @@ const initDatabase = async () => {
     await Document.sync({ alter: alterSync, force: forceSync });
     console.log('Document model synchronized');
     
-    console.log('All database tables have been synchronized successfully.');
+    await Preference.sync({ alter: alterSync, force: forceSync });
+    console.log('Preference model synchronized');
+    
+    await Location.sync({ alter: alterSync, force: forceSync });
+    console.log('Location model synchronized');
+    
+    await JobProfile.sync({ alter: alterSync, force: forceSync });
+    console.log('JobProfile model synchronized');
+    
+    await JobData.sync({ alter: alterSync, force: forceSync });
+    console.log('JobData model synchronized');
+    
+    console.log('All database tables have been synchronized successfully');
   } catch (error) {
     console.error('Unable to initialize database:', error);
     throw error;

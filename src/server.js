@@ -28,6 +28,10 @@ const collegeRoutes = require('./routes/collegeRoutes');
 const resumeCollectionRoutes = require('./routes/resumeCollectionRoutes');
 const importedJobRoutes = require('./routes/importedJobRoutes');
 const documentRoutes = require('./routes/documentRoutes');
+const preferenceRoutes = require('./routes/preferenceRoutes');
+const locationRoutes = require('./routes/locationRoutes');
+const jobProfileRoutes = require('./routes/jobProfileRoutes');
+const jobDataRoutes = require('./routes/jobDataRoutes');
 
 // Initialize express app
 const app = express();
@@ -87,6 +91,10 @@ app.use('/api/colleges', collegeRoutes);
 app.use('/api/resume-collections', resumeCollectionRoutes);
 app.use('/api/imported-jobs', importedJobRoutes);
 app.use('/api/documents', documentRoutes);
+app.use('/api/preferences', preferenceRoutes);
+app.use('/api/locations', locationRoutes);
+app.use('/api/job-profiles', jobProfileRoutes);
+app.use('/api/job-data', jobDataRoutes);
 
 // Default route
 app.get('/', (req, res) => {
