@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/dbConfig');
 
-// Default statuses that will always be available
 const DEFAULT_STATUSES = ['Saved', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
 
 const ImportedJob = sequelize.define('ImportedJob', {
@@ -14,7 +13,11 @@ const ImportedJob = sequelize.define('ImportedJob', {
     type: DataTypes.STRING(255),
     allowNull: false
   },
-  job_location: {
+  job_platform_name: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
+  location: {
     type: DataTypes.STRING(255),
     allowNull: true
   },
@@ -23,14 +26,30 @@ const ImportedJob = sequelize.define('ImportedJob', {
     allowNull: true
   },
   job_url: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  data_source: {
+    type: DataTypes.STRING(5000),
+    allowNull: true
+  },
+  data: {
+    type: DataTypes.JSON,
     allowNull: true
   },
   salary: {
     type: DataTypes.STRING(255),
     allowNull: true
   },
-  roles_and_responsibilities: {
+  employment_type: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
+  experience_needed: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  responsibilities: {
     type: DataTypes.TEXT,
     allowNull: true
   },
@@ -38,11 +57,23 @@ const ImportedJob = sequelize.define('ImportedJob', {
     type: DataTypes.TEXT,
     allowNull: true
   },
-  skills: {
+  requirements: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  qualification: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  skill_required: {
     type: DataTypes.TEXT,
     allowNull: true
   },
   perks: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  job_raw_text: {
     type: DataTypes.TEXT,
     allowNull: true
   },
@@ -53,7 +84,6 @@ const ImportedJob = sequelize.define('ImportedJob', {
     validate: {
       isValidStatus(value) {
         if (value && !DEFAULT_STATUSES.includes(value)) {
-          // Allow custom statuses but ensure they're not empty and are strings
           if (typeof value !== 'string' || value.trim().length === 0) {
             throw new Error('Invalid job status');
           }
@@ -84,11 +114,8 @@ const ImportedJob = sequelize.define('ImportedJob', {
   updatedAt: 'updated_at'
 });
 
-// Add a static method to get all available statuses
 ImportedJob.getAvailableStatuses = function() {
   return [...DEFAULT_STATUSES];
 };
 
-// Note: Associations are defined in src/config/dbInit.js
-
-module.exports = ImportedJob; 
+module.exports = ImportedJob;

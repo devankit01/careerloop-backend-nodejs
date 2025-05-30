@@ -34,10 +34,6 @@ const Document = sequelize.define('Document', {
   imported_job_id: {
     type: DataTypes.INTEGER,
     allowNull: true,
-    references: {
-      model: 'imported_jobs',
-      key: 'id'
-    }
   },
   created_at: {
     type: DataTypes.DATE,

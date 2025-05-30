@@ -8,24 +8,22 @@ const ImportedJob = require('../models/ImportedJob');
 exports.addNote = async (req, res) => {
   try {
     const userId = req.user.id;
-    
     // Get student profile
     const student = await Student.findOne({ where: { user_id: userId } });
-    
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student profile not found. Please create a profile first.'
       });
     }
-    
+
     // Create note entry
     const note = await Note.create({
       jobseeker_id: student.id,
       text: req.body.text,
       imported_job_id: req.body.imported_job_id || null
     });
-    
+
     res.status(201).json({
       success: true,
       data: note
@@ -46,17 +44,15 @@ exports.addNote = async (req, res) => {
 exports.getNotes = async (req, res) => {
   try {
     const userId = req.user.id;
-    
     // Get student profile
     const student = await Student.findOne({ where: { user_id: userId } });
-    
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student profile not found'
       });
     }
-    
+
     // Get notes
     const notes = await Note.findAll({
       where: { jobseeker_id: student.id },
@@ -69,7 +65,7 @@ exports.getNotes = async (req, res) => {
       ],
       order: [['created_at', 'DESC']]
     });
-    
+
     res.json({
       success: true,
       data: notes
@@ -91,38 +87,36 @@ exports.updateNote = async (req, res) => {
   try {
     const userId = req.user.id;
     const noteId = req.params.id;
-    
     // Get student profile
     const student = await Student.findOne({ where: { user_id: userId } });
-    
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student profile not found'
       });
     }
-    
-    // Find the note entry
+
+    // Find the note entry and check ownership
     const note = await Note.findOne({
       where: {
         id: noteId,
         jobseeker_id: student.id
       }
     });
-    
+
     if (!note) {
       return res.status(404).json({
         success: false,
         message: 'Note not found or not authorized'
       });
     }
-    
+
     // Update note
     await note.update({
-      text: req.body.text || note.text,
+      text: req.body.text !== undefined ? req.body.text : note.text,
       imported_job_id: req.body.imported_job_id !== undefined ? req.body.imported_job_id : note.imported_job_id
     });
-    
+
     res.json({
       success: true,
       data: note
@@ -144,34 +138,32 @@ exports.deleteNote = async (req, res) => {
   try {
     const userId = req.user.id;
     const noteId = req.params.id;
-    
     // Get student profile
     const student = await Student.findOne({ where: { user_id: userId } });
-    
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student profile not found'
       });
     }
-    
-    // Find and delete the note entry
+
+    // Find and delete the note entry, check ownership
     const note = await Note.findOne({
       where: {
         id: noteId,
         jobseeker_id: student.id
       }
     });
-    
+
     if (!note) {
       return res.status(404).json({
         success: false,
         message: 'Note not found or not authorized'
       });
     }
-    
+
     await note.destroy();
-    
+
     res.json({
       success: true,
       message: 'Note removed successfully'
@@ -184,4 +176,4 @@ exports.deleteNote = async (req, res) => {
       error: process.env.NODE_ENV === 'production' ? null : error.message
     });
   }
-}; 
+};
