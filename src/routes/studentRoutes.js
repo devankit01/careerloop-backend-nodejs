@@ -1,12 +1,21 @@
 const express = require('express');
 const router = express.Router();
+
 const studentController = require('../controllers/studentController');
 const jobApplicationController = require('../controllers/jobApplicationController');
 const contactController = require('../controllers/contactController');
+const taskController = require('../controllers/taskController'); // <-- Import Task Controller
+
 const { protect, checkRole, isActive } = require('../middleware/authMiddleware');
 
 // Public routes
 router.get('/', studentController.getAllStudents);
+
+// Task routes (Student only)
+router.post('/tasks', protect, checkRole(['student']), taskController.addTask);
+router.get('/tasks', protect, checkRole(['student']), taskController.getTasks);
+router.put('/tasks/:id', protect, checkRole(['student']), taskController.updateTask);
+router.delete('/tasks/:id', protect, checkRole(['student']), taskController.deleteTask);
 
 // Private routes - Student only
 router.post('/profile', protect, checkRole(['student']), studentController.createUpdateStudentProfile);
@@ -50,4 +59,4 @@ router.delete('/contacts/:id', protect, checkRole(['student']), contactControlle
 // Put the generic ID route LAST, after all specific routes
 router.get('/:id', studentController.getStudentById);
 
-module.exports = router; 
+module.exports = router;

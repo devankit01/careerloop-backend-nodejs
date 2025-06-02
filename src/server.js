@@ -95,6 +95,9 @@ app.use('/api/preferences', preferenceRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/job-profiles', jobProfileRoutes);
 app.use('/api/job-data', jobDataRoutes);
+const linkedDocumentsRouter = require('../src/routes/inkedDocuments');
+app.use('/linked-documents', linkedDocumentsRouter);
+
 
 // Default route
 app.get('/', (req, res) => {
