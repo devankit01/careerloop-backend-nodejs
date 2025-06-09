@@ -49,7 +49,7 @@ const httpServer = http
   });
 app.use("/api", require("./app/routes/index"));
 
-// Error Middleware
+// Error Middleware fun
 app.use(errorHandler.methodNotAllowed);
 
 process.on("unhandledRejection", (err) => {
