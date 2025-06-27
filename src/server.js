@@ -48,7 +48,8 @@ app.use(cors({
       'https://www.careerloop.in',
       'https://dev.careerloop.in',
       'http://localhost:3000',
-      'http://localhost:5173'
+      'http://localhost:5173',
+      'https://careerloop-dev.netlify.app'
     ];
     
     // Allow requests with no origin (like mobile apps, curl, etc)
