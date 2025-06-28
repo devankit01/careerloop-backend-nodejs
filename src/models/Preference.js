@@ -31,10 +31,26 @@ const Preference = sequelize.define('Preference', {
       }
     }
   },
-  job_function: {
-    type: DataTypes.STRING(255),
-    allowNull: true
+  // job_function: {
+  //   type: DataTypes.STRING(255),
+  //   allowNull: true
+  // },
+job_function: {
+  type: DataTypes.STRING(255),
+  allowNull: true,
+  comment: 'Comma-separated job functions',
+  get() {
+    const rawValue = this.getDataValue('job_function');
+    return rawValue ? rawValue.split(',') : [];
   },
+  set(val) {
+    if (Array.isArray(val)) {
+      this.setDataValue('job_function', val.join(','));
+    } else {
+      this.setDataValue('job_function', val);
+    }
+  }
+},
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

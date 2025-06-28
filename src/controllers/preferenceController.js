@@ -43,7 +43,8 @@ exports.createUpdatePreferences = async (req, res) => {
     }
     
     const { job_type, job_function } = req.body;
-    
+
+    const jobFunctionString = Array.isArray(job_function) ? job_function.join(',') : job_function;
     // Find existing preference
     let preference = await Preference.findOne({ where: { student_id: student.id } });
     
@@ -51,14 +52,14 @@ exports.createUpdatePreferences = async (req, res) => {
       // Update existing preference
       preference = await preference.update({
         job_type,
-        job_function
+        job_function: jobFunctionString
       });
     } else {
       // Create new preference
       preference = await Preference.create({
         student_id: student.id,
         job_type,
-        job_function
+        job_function: jobFunctionString
       });
     }
     
