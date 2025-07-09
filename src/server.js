@@ -32,6 +32,7 @@ const preferenceRoutes = require('./routes/preferenceRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const jobProfileRoutes = require('./routes/jobProfileRoutes');
 const jobDataRoutes = require('./routes/jobDataRoutes');
+const noteRoutes = require('./routes/notesRoutes');
 
 // Initialize express app
 const app = express();
@@ -99,6 +100,7 @@ app.use('/api/job-data', jobDataRoutes);
 const linkedDocumentsRouter = require('../src/routes/inkedDocuments');
 app.use('/linked-documents', linkedDocumentsRouter);
 
+app.use('/api/notes', noteRoutes);
 
 // Default route
 app.get('/', (req, res) => {

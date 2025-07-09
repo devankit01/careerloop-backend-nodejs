@@ -59,4 +59,39 @@ router.delete('/contacts/:id', protect, checkRole(['student']), contactControlle
 // Put the generic ID route LAST, after all specific routes
 router.get('/:id', studentController.getStudentById);
 
+
+// find weekly-goal
+
+router.get('/weeklygoal', async (req, res) => {
+  const { start, end } = req.query;
+
+  if (!start || !end) {
+    return res.status(400).json({ error: 'Start and end dates are required' });
+  }
+
+  try {
+    const [rows] = await db.execute(
+      `
+      SELECT
+        ij.jobseeker_id,
+        WEEK(ij.created_at, 1) AS week_number,
+        YEAR(ij.created_at) AS year,
+        p.weekly_goal,
+        COUNT(*) AS actual_imported_jobs
+      FROM imported_jobs ij
+      JOIN preference p ON ij.jobseeker_id = p.jobseeker_id
+      WHERE ij.created_at BETWEEN ? AND ?
+      GROUP BY ij.jobseeker_id, YEAR(ij.created_at), WEEK(ij.created_at, 1), p.weekly_goal
+      ORDER BY ij.jobseeker_id, year, week_number
+      `,
+      [start, end]
+    );
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Goal vs actual error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;

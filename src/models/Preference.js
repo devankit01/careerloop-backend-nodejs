@@ -51,6 +51,18 @@ job_function: {
     }
   }
 },
+  weekly_goal: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: 'Number of jobs the user wants to apply for weekly'
+  },
+  streak: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+    comment: 'Current streak count of meeting weekly goals'
+  },
+
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
