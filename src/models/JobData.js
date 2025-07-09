@@ -59,6 +59,10 @@ const JobData = sequelize.define('JobData', {
     type: DataTypes.TEXT,
     allowNull: true
   },
+    publish_date: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
