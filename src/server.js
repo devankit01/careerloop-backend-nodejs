@@ -33,6 +33,9 @@ const locationRoutes = require('./routes/locationRoutes');
 const jobProfileRoutes = require('./routes/jobProfileRoutes');
 const jobDataRoutes = require('./routes/jobDataRoutes');
 const noteRoutes = require('./routes/notesRoutes');
+const taskRoutes = require('./routes/taskRoutes');
+const certificationRoutes = require('./routes/certificationRoutes');
+const weeklyStatsRoutes = require('./routes/weeklyStatsRoutes');
 
 // Initialize express app
 const app = express();
@@ -101,6 +104,11 @@ const linkedDocumentsRouter = require('../src/routes/inkedDocuments');
 app.use('/linked-documents', linkedDocumentsRouter);
 
 app.use('/api/notes', noteRoutes);
+app.use('/api/task', taskRoutes);
+app.use('/api/certifications', certificationRoutes);
+
+app.use('/api/stats', weeklyStatsRoutes);
+
 
 // Default route
 app.get('/', (req, res) => {
