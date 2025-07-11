@@ -37,10 +37,14 @@ const Student = sequelize.define('Student', {
     type: DataTypes.STRING(255),
     allowNull: true
   },
+  // social_media_links: {
+  //   type: DataTypes.STRING(255),
+  //   allowNull: true
+  // },
   social_media_links: {
-    type: DataTypes.STRING(255),
-    allowNull: true
-  },
+  type: DataTypes.JSON,
+  allowNull: true
+},
   degree: {
     type: DataTypes.STRING(255),
     allowNull: true
