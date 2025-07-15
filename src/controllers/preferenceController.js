@@ -7,16 +7,16 @@ const Student = require('../models/Student');
 exports.getMyPreferences = async (req, res) => {
   try {
     const student = await Student.findOne({ where: { user_id: req.user.id } });
-    
+
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student profile not found' });
     }
-    
-    const preferences = await Preference.findAll({ 
+
+    const preferences = await Preference.findAll({
       where: { student_id: student.id },
       order: [['created_at', 'DESC']]
     });
-    
+
     res.status(200).json({
       success: true,
       data: preferences
@@ -37,32 +37,33 @@ exports.getMyPreferences = async (req, res) => {
 exports.createUpdatePreferences = async (req, res) => {
   try {
     const student = await Student.findOne({ where: { user_id: req.user.id } });
-    
+
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student profile not found' });
     }
-    
-    const { job_type, job_function } = req.body;
+    const { job_type, job_function, weekly_goal } = req.body;
 
-    const jobFunctionString = Array.isArray(job_function) ? job_function.join(',') : job_function;
     // Find existing preference
     let preference = await Preference.findOne({ where: { student_id: student.id } });
-    
     if (preference) {
       // Update existing preference
-      preference = await preference.update({
-        job_type,
-        job_function: jobFunctionString
-      });
+      const updatedPreference = {
+        job_type: Array.isArray(job_type) ? job_type : preference.job_type,
+        job_function: Array.isArray(job_function) ? job_function : preference.job_function,
+        weekly_goal: weekly_goal !== undefined ? weekly_goal : preference.weekly_goal
+      };
+
+      preference = await preference.update(updatedPreference);
     } else {
       // Create new preference
       preference = await Preference.create({
         student_id: student.id,
-        job_type,
-        job_function: jobFunctionString
+        job_type: cleanedJobType,
+        job_function: cleanedJobFunction,
+        weekly_goal: weekly_goal,
       });
     }
-    
+
     res.status(200).json({
       success: true,
       data: preference
@@ -83,24 +84,24 @@ exports.createUpdatePreferences = async (req, res) => {
 exports.deletePreference = async (req, res) => {
   try {
     const student = await Student.findOne({ where: { user_id: req.user.id } });
-    
+
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student profile not found' });
     }
-    
+
     const preference = await Preference.findByPk(req.params.id);
-    
+
     if (!preference) {
       return res.status(404).json({ success: false, message: 'Preference not found' });
     }
-    
+
     // Check if the preference belongs to the student
     if (preference.student_id !== student.id) {
       return res.status(403).json({ success: false, message: 'Not authorized to delete this preference' });
     }
-    
+
     await preference.destroy();
-    
+
     res.status(200).json({
       success: true,
       message: 'Preference deleted successfully'
@@ -130,7 +131,7 @@ exports.getAllPreferences = async (req, res) => {
       ],
       order: [['created_at', 'DESC']]
     });
-    
+
     res.status(200).json({
       success: true,
       count: preferences.length,

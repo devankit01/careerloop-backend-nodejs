@@ -15,42 +15,15 @@ const Preference = sequelize.define('Preference', {
       key: 'id'
     }
   },
+
   job_type: {
-    type: DataTypes.STRING(255),
-    allowNull: true,
-    comment: 'Comma-separated values: full-time, part-time, contract, internship',
-    get() {
-      const rawValue = this.getDataValue('job_type');
-      return rawValue ? rawValue.split(',') : [];
-    },
-    set(val) {
-      if (Array.isArray(val)) {
-        this.setDataValue('job_type', val.join(','));
-      } else {
-        this.setDataValue('job_type', val);
-      }
-    }
+    type: DataTypes.JSON, 
+    allowNull: true
   },
-  // job_function: {
-  //   type: DataTypes.STRING(255),
-  //   allowNull: true
-  // },
-job_function: {
-  type: DataTypes.STRING(255),
-  allowNull: true,
-  comment: 'Comma-separated job functions',
-  get() {
-    const rawValue = this.getDataValue('job_function');
-    return rawValue ? rawValue.split(',') : [];
+  job_function: {
+    type: DataTypes.JSON, 
+    allowNull: true
   },
-  set(val) {
-    if (Array.isArray(val)) {
-      this.setDataValue('job_function', val.join(','));
-    } else {
-      this.setDataValue('job_function', val);
-    }
-  }
-},
   weekly_goal: {
     type: DataTypes.INTEGER,
     allowNull: true,
