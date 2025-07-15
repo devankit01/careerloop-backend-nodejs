@@ -4,6 +4,7 @@ const Task = require('../models/Task');
 const Note = require('../models/Note');
 const Contact = require('../models/Contact');
 const Document = require('../models/Document');
+const JobStatusTrack = require('../models/job_status_tracks');
 
 // @desc    Get all available job statuses
 // @route   GET /api/imported-jobs/statuses
@@ -31,17 +32,19 @@ exports.getJobStatuses = async (req, res) => {
 exports.addImportedJob = async (req, res) => {
   try {
     const userId = req.user.id;
-    
+
     // Get student profile
     const student = await Student.findOne({ where: { user_id: userId } });
-    
+
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student profile not found. Please create a profile first.'
       });
     }
-    
+
+    const jobStatus = req.body.imported_job_status || 'Saved';
+    const jobType = req.body.data_source || 'manual';
     // Create imported job entry
     const importedJob = await ImportedJob.create({
       jobseeker_id: student.id,
@@ -54,9 +57,18 @@ exports.addImportedJob = async (req, res) => {
       description: req.body.description,
       skills: req.body.skills,
       perks: req.body.perks,
-      imported_job_status: req.body.imported_job_status || 'Saved'
+      imported_job_status: jobStatus,
+      data_source: req.body.data_source || 'manual', 
     });
-    
+
+    //  Add entry to job_status_tracks table
+    await JobStatusTrack.create({
+      job_id: importedJob.id,
+      jobseeker_id: student.id,
+      status: jobStatus,
+      type: jobType,
+    });
+
     res.status(201).json({
       success: true,
       data: importedJob
@@ -77,23 +89,23 @@ exports.addImportedJob = async (req, res) => {
 exports.getImportedJobs = async (req, res) => {
   try {
     const userId = req.user.id;
-    
+
     // Get student profile
     const student = await Student.findOne({ where: { user_id: userId } });
-    
+
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student profile not found'
       });
     }
-    
+
     // Get imported jobs
     const importedJobs = await ImportedJob.findAll({
       where: { jobseeker_id: student.id },
       order: [['created_at', 'DESC']]
     });
-    
+
     res.json({
       success: true,
       data: importedJobs
@@ -115,17 +127,17 @@ exports.getImportedJobById = async (req, res) => {
   try {
     const userId = req.user.id;
     const jobId = req.params.id;
-    
+
     // Get student profile
     const student = await Student.findOne({ where: { user_id: userId } });
-    
+
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student profile not found'
       });
     }
-    
+
     // Find the imported job entry
     const importedJob = await ImportedJob.findOne({
       where: {
@@ -151,14 +163,14 @@ exports.getImportedJobById = async (req, res) => {
         }
       ]
     });
-    
+
     if (!importedJob) {
       return res.status(404).json({
         success: false,
         message: 'Imported job not found or not authorized'
       });
     }
-    
+
     res.json({
       success: true,
       data: importedJob
@@ -180,17 +192,17 @@ exports.updateImportedJob = async (req, res) => {
   try {
     const userId = req.user.id;
     const jobId = req.params.id;
-    
+
     // Get student profile
     const student = await Student.findOne({ where: { user_id: userId } });
-    
+
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student profile not found'
       });
     }
-    
+
     // Find the imported job entry
     const importedJob = await ImportedJob.findOne({
       where: {
@@ -198,14 +210,16 @@ exports.updateImportedJob = async (req, res) => {
         jobseeker_id: student.id
       }
     });
-    
+
     if (!importedJob) {
       return res.status(404).json({
         success: false,
         message: 'Imported job not found or not authorized'
       });
     }
-    
+
+    const oldStatus = importedJob.imported_job_status;
+
     // Update imported job
     await importedJob.update({
       job_title: req.body.job_title || importedJob.job_title,
@@ -219,7 +233,18 @@ exports.updateImportedJob = async (req, res) => {
       perks: req.body.perks !== undefined ? req.body.perks : importedJob.perks,
       imported_job_status: req.body.imported_job_status !== undefined ? req.body.imported_job_status : importedJob.imported_job_status
     });
-    
+
+    // If status is changed, track it
+    if (req.body.imported_job_status && req.body.imported_job_status !== oldStatus) {
+      const jobType = importedJob?.data_source || 'manual';
+      await JobStatusTrack.create({
+        job_id: importedJob.id,
+        jobseeker_id: student.id,
+        status: req.body.imported_job_status,
+        type: jobType
+      });
+    }
+
     res.json({
       success: true,
       data: importedJob
@@ -241,17 +266,17 @@ exports.deleteImportedJob = async (req, res) => {
   try {
     const userId = req.user.id;
     const jobId = req.params.id;
-    
+
     // Get student profile
     const student = await Student.findOne({ where: { user_id: userId } });
-    
+
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student profile not found'
       });
     }
-    
+
     // Find and delete the imported job entry
     const importedJob = await ImportedJob.findOne({
       where: {
@@ -259,16 +284,22 @@ exports.deleteImportedJob = async (req, res) => {
         jobseeker_id: student.id
       }
     });
-    
+
     if (!importedJob) {
       return res.status(404).json({
         success: false,
         message: 'Imported job not found or not authorized'
       });
     }
-    
+    //   Delete related job status track entries
+    await JobStatusTrack.destroy({
+      where: {
+        job_id: jobId,
+        jobseeker_id: student.id
+      }
+    });
     await importedJob.destroy();
-    
+
     res.json({
       success: true,
       message: 'Imported job removed successfully'

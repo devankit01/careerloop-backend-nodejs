@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { getWeeklyGoalStats } = require('../controllers/weeklyStatsController');
-// const authenticate = require('../middleware/authenticate'); // Your auth middleware
+const { protect, checkRole  } = require('../middleware/authMiddleware');
 
-// router.get('/weekly-goal-vs-actual', authenticate, getWeeklyGoalStats);
-router.get('/goal',getWeeklyGoalStats);
+router.get('/statsGoal',protect,checkRole(['student']),getWeeklyGoalStats);
 
 module.exports = router;
