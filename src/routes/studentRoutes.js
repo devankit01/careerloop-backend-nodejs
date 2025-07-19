@@ -51,7 +51,7 @@ router.delete('/award-achievement/:id', protect, checkRole(['student']), student
 
 // Contact routes
 router.get('/contacts', protect, checkRole(['student']), contactController.getContacts);
-router.get('/contacts/:id', protect, checkRole(['student']), contactController.getContactById);
+router.get('/contacts/:jobId', protect, checkRole(['student']), contactController.getContactById);
 router.post('/contacts', protect, checkRole(['student']), contactController.addContact);
 router.put('/contacts/:id', protect, checkRole(['student']), contactController.updateContact);
 router.delete('/contacts/:id', protect, checkRole(['student']), contactController.deleteContact);

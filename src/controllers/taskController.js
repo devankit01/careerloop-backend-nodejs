@@ -50,9 +50,10 @@ exports.addTask = async (req, res) => {
   }
 };
 
-// @desc    Get all tasks for a student
+// @desc    Get job Specific tasks for a student
 exports.getTasks = async (req, res) => {
   try {
+       const { jobId } = req.params;
     const userId = req.user.id;
     const student = await getStudentByUserId(userId);
 
@@ -65,7 +66,7 @@ exports.getTasks = async (req, res) => {
     }
 
     const tasks = await Task.findAll({
-      where: { jobseeker_id: student.id },
+      where: { jobseeker_id: student.id , imported_job_id: jobId },
       include: [
         {
           model: ImportedJob,

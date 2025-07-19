@@ -41,6 +41,32 @@ exports.getDocumentsByJobseekerId = async (req, res) => {
     });
   }
 };
+// Get documents by jobseeker_id
+exports.getDocumentsByJobseekerIdAndJobId = async (req, res) => {
+  try {
+    const { jobseekerId } = req.params;
+     const { jobId } = req.params;
+
+    const documents = await Document.findAll({
+      where: { jobseeker_id: jobseekerId, imported_job_id:jobId }
+    });
+    
+    return res.status(200).json({
+      success: true,
+      data: documents
+    });
+  } catch (error) {
+    console.error('Error fetching documents by jobseeker ID:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch documents',
+      error: error.message
+    });
+  }
+};
+
+
+
 
 // Get document by ID
 exports.getDocumentById = async (req, res) => {
