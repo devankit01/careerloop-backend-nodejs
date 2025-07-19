@@ -4,10 +4,13 @@ const documentController = require('../controllers/documentController');
 const { protect, checkRole } = require('../middleware/authMiddleware');
 
 // GET all documents
-router.get('/', protect, documentController.getAllDocuments);
+router.get('/admingetDoc', protect, documentController.getAllDocuments);
 
 // GET documents by jobseeker ID
 router.get('/jobseeker/:jobseekerId', protect, documentController.getDocumentsByJobseekerId);
+
+// GET documents by jobseeker ID and job id
+router.get('/jobseeker/:jobseekerId/:jobId', protect, documentController.getDocumentsByJobseekerIdAndJobId);
 
 // GET document by ID
 router.get('/:id', protect, documentController.getDocumentById);

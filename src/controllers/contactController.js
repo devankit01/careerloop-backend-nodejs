@@ -98,7 +98,8 @@ exports.getContacts = async (req, res) => {
 exports.getContactById = async (req, res) => {
   try {
     const userId = req.user.id;
-    const contactId = req.params.id;
+     const {jobId}  = req.params;
+    // const contactId = req.params.id;
     
     // Get student profile
     const student = await Student.findOne({ where: { user_id: userId } });
@@ -111,10 +112,11 @@ exports.getContactById = async (req, res) => {
     }
     
     // Find the contact entry
-    const contact = await Contact.findOne({
+    const contact = await Contact.findAll({
       where: {
-        id: contactId,
-        jobseeker_id: student.id
+        // id: contactId,
+        jobseeker_id: student.id,
+        imported_job_id:jobId 
       },
       include: [
         {
