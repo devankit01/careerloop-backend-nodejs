@@ -23,6 +23,14 @@ const JobData = sequelize.define('JobData', {
     type: DataTypes.STRING(500),
     allowNull: true
   },
+  salary:{
+type:DataTypes.STRING(200 ),
+  allowNull: true
+  } ,
+description :{
+type:DataTypes.TEXT,
+allowNull:true
+},
   data: {
     type: DataTypes.JSON,
     allowNull: true
