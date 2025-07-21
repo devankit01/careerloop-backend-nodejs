@@ -41,15 +41,20 @@ exports.createUpdatePreferences = async (req, res) => {
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student profile not found' });
     }
-    const { job_type, job_function, weekly_goal } = req.body;
 
+    const { job_type, job_function, weekly_goal } = req.body;
+    // console.log("Incoming job_type:", job_type);
+    const cleanedJobType = Array.isArray(job_type) ? job_type : [];
+    // console.log("cleanedJobType created:", cleanedJobType);
+    const cleanedJobFunction = Array.isArray(job_function) ? job_function : [];
     // Find existing preference
     let preference = await Preference.findOne({ where: { student_id: student.id } });
+
     if (preference) {
       // Update existing preference
       const updatedPreference = {
-        job_type: Array.isArray(job_type) ? job_type : preference.job_type,
-        job_function: Array.isArray(job_function) ? job_function : preference.job_function,
+        job_type: cleanedJobType.length > 0 ? cleanedJobType : preference.job_type,
+        job_function: cleanedJobFunction.length > 0 ? cleanedJobFunction : preference.job_function,
         weekly_goal: weekly_goal !== undefined ? weekly_goal : preference.weekly_goal
       };
 
@@ -77,6 +82,7 @@ exports.createUpdatePreferences = async (req, res) => {
     });
   }
 };
+
 
 // @desc    Delete preferences
 // @route   DELETE /api/preferences/:id
