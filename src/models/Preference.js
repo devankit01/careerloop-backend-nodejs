@@ -15,6 +15,19 @@ const Preference = sequelize.define('Preference', {
       key: 'id'
     }
   },
+  skills:{
+    type:DataTypes.JSON,
+    allowNull:true
+  },
+  location:{
+    type:DataTypes.STRING,
+    allowNull:true,
+  },
+  job_experience:{
+    type:DataTypes.INTEGER,
+    allowNull:true,
+    defaultValue: 0,
+  },
 
   job_type: {
     type: DataTypes.JSON, 

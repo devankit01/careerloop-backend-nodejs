@@ -42,9 +42,10 @@ exports.createUpdatePreferences = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Student profile not found' });
     }
 
-    const { job_type, job_function, weekly_goal } = req.body;
+    const { job_type, job_function, weekly_goal,skills,job_experience,location} = req.body;
     // console.log("Incoming job_type:", job_type);
     const cleanedJobType = Array.isArray(job_type) ? job_type : [];
+    const cleanedJobSkills = Array.isArray(skills) ? skills : [];
     // console.log("cleanedJobType created:", cleanedJobType);
     const cleanedJobFunction = Array.isArray(job_function) ? job_function : [];
     // Find existing preference
@@ -54,8 +55,12 @@ exports.createUpdatePreferences = async (req, res) => {
       // Update existing preference
       const updatedPreference = {
         job_type: cleanedJobType.length > 0 ? cleanedJobType : preference.job_type,
+        skills: cleanedJobSkills.length > 0 ? cleanedJobSkills : preference.skills,
         job_function: cleanedJobFunction.length > 0 ? cleanedJobFunction : preference.job_function,
-        weekly_goal: weekly_goal !== undefined ? weekly_goal : preference.weekly_goal
+        weekly_goal: weekly_goal !== undefined ? weekly_goal : preference.weekly_goal,
+        job_experience: typeof job_experience === "number"? job_experience : preference?.job_experience ?? 0,
+        location:location,
+
       };
 
       preference = await preference.update(updatedPreference);
@@ -64,8 +69,11 @@ exports.createUpdatePreferences = async (req, res) => {
       preference = await Preference.create({
         student_id: student.id,
         job_type: cleanedJobType,
+        skills:cleanedJobSkills,
         job_function: cleanedJobFunction,
         weekly_goal: weekly_goal,
+        job_experience: typeof job_experience === "number" ? job_experience : 0,
+        location:location,
       });
     }
 
