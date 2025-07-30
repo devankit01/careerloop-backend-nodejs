@@ -61,3 +61,112 @@ exports.searchJobs = async (req, res) => {
     });
   }
 };
+
+
+exports.searchJobswithId = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const whereClause = {};
+    // Search by job Id if provided
+    if (id) {
+      whereClause.id = {
+        [Op.like]: `%${id}%`
+      };
+    }
+
+    // Execute the search query without pagination
+    const jobs = await JobData.findAll({
+      where: whereClause,
+      order: [
+        ['created_at', 'DESC']
+      ]
+    });
+
+    // Return the search results
+    res.status(200).json({
+      success: true,
+      count: jobs.length,
+      data: jobs
+    });
+  } catch (error) {
+    console.error('Error searching jobs:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+
+exports.searchJobsByPreference = async (req, res) => {
+  try {
+    const { job_title, job_type, skill_required } = req.body;
+
+    const orConditions = [];
+
+    // Add job title filter (OR within the field)
+    if (Array.isArray(job_title) && job_title.length > 0) {
+      orConditions.push({
+        job_title: {
+          [Op.or]: job_title
+            .map(title => title?.trim())
+            .filter(Boolean)
+            .map(title => ({
+              [Op.like]: `%${title}%`,
+            })),
+        },
+      });
+    }
+
+    // Add skill_required filter (OR within the field)
+    if (Array.isArray(skill_required) && skill_required.length > 0) {
+      orConditions.push({
+        skill_required: {
+          [Op.or]: skill_required
+            .map(skill => skill?.trim())
+            .filter(Boolean)
+            .map(skill => ({
+              [Op.like]: `%${skill}%`,
+            })),
+        },
+      });
+    }
+
+    // Add job type filter (OR within the field)
+    if (Array.isArray(job_type) && job_type.length > 0) {
+      orConditions.push({
+        job_type: {
+          [Op.or]: job_type
+            .map(type => type?.trim())
+            .filter(Boolean)
+            .map(type => ({
+              [Op.like]: `%${type}%`,
+            })),
+        },
+      });
+    }
+
+    // Default to empty condition if nothing is provided
+    const whereClause = orConditions.length > 0 ? { [Op.or]: orConditions } : {};
+
+    // Fetch matching jobs
+    const jobs = await JobData.findAll({
+      where: whereClause,
+      order: [["created_at", "DESC"]],
+    });
+
+    res.status(200).json({
+      success: true,
+      count: jobs.length,
+      data: jobs,
+    });
+  } catch (error) {
+    console.error("Error searching jobs:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
