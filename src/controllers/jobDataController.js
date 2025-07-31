@@ -8,6 +8,12 @@ const { Op } = require('sequelize');
 exports.searchJobs = async (req, res) => {
   try {
     const { job_title, location, job_type } = req.query;
+
+    // Pagination setup
+    const page = parseInt(req.query.page) || 1; // Get page from query, default to 1
+    const limit = 10; // Items per page
+    const offset = (page - 1) * limit; // Calculate offset
+
     // Build the where clause for search
     const whereClause = {};
     // Search by job title if provided
@@ -38,18 +44,36 @@ exports.searchJobs = async (req, res) => {
       };
     }
 
-    // Execute the search query without pagination
-    const jobs = await JobData.findAll({
+    console.log('Final WHERE clause:', JSON.stringify(whereClause, null, 2));
+    
+    // Execute the search query with pagination and optimization
+    const { rows: jobs, count: totalJobs } = await JobData.findAndCountAll({
       where: whereClause,
       order: [
         ['created_at', 'DESC']
-      ]
+      ],
+      limit, // Apply limit for pagination
+      offset, // Apply offset for pagination
+    
+      // Return only selected fields to reduce payload size
+      attributes: [
+        'id',
+        'job_title',
+        'location',
+        'salary',
+        'job_platform_name',
+        'job_url',
+        'created_at'
+      ]    
     });
 
-    // Return the search results
+    // Return the paginated search results
     res.status(200).json({
       success: true,
       count: jobs.length,
+      totalJobs,
+      currentPage: page,
+      totalPages: Math.ceil(totalJobs / limit),      
       data: jobs
     });
   } catch (error) {
