@@ -45,7 +45,7 @@ exports.searchJobs = async (req, res) => {
     }
 
     console.log('Final WHERE clause:', JSON.stringify(whereClause, null, 2));
-    
+
     // Execute the search query with pagination and optimization
     const { rows: jobs, count: totalJobs } = await JobData.findAndCountAll({
       where: whereClause,
@@ -54,27 +54,37 @@ exports.searchJobs = async (req, res) => {
       ],
       limit, // Apply limit for pagination
       offset, // Apply offset for pagination
-    
+
       // Return only selected fields to reduce payload size
       attributes: [
         'id',
         'job_title',
         'location',
         'salary',
-        'job_platform_name',
         'job_url',
+        "job_type",
+        "experience_needed",
+        "data",
+        "publish_date",
         'created_at'
-      ]    
+      ]
+    });
+
+    const formattedJobs = jobs.map(job => {
+      const jobObj = job.toJSON();
+
+      return {...jobObj, data: {company: jobObj.data?.company || null }
+      };
     });
 
     // Return the paginated search results
     res.status(200).json({
       success: true,
-      count: jobs.length,
+      count: formattedJobs.length,
       totalJobs,
       currentPage: page,
-      totalPages: Math.ceil(totalJobs / limit),      
-      data: jobs
+      totalPages: Math.ceil(totalJobs / limit),
+      data: formattedJobs
     });
   } catch (error) {
     console.error('Error searching jobs:', error);
